@@ -1,0 +1,5 @@
+tk database PlanetScale: khongten2002ct@gmail.com |   @Huybach2002ct
+
+mk db cockroachlabs.cloud: 1yfLkgmDePDrHdT248xJVA
+
+db neon.tech: postgresql://huybach2002ct:d4SJMV7jPcFw@ep-odd-sunset-a5tim0ee.us-east-2.aws.neon.tech/elearningdb?sslmode=require
