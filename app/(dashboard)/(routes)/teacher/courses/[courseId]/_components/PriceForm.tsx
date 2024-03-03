@@ -19,7 +19,9 @@ import {SquarePen} from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import {cn} from "@/lib/utils";
 import {Course} from "@prisma/client";
+import {formatPrice} from "@/lib/format";
 
 type Props = {
   initialData: Course;
@@ -27,12 +29,10 @@ type Props = {
 };
 
 const formSchema = z.object({
-  title: z.string().min(2, {
-    message: "This field cannot be empty",
-  }),
+  price: z.coerce.number(),
 });
 
-const TitleForm = ({initialData, courseId}: Props) => {
+const PriceForm = ({initialData, courseId}: Props) => {
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -40,7 +40,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: initialData.title || "",
+      price: initialData.price || undefined,
     },
   });
 
@@ -49,7 +49,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await axios.put(`/api/courses/${courseId}`, values);
-      toast.success("Title updated");
+      toast.success("Price updated");
       router.refresh();
       setIsEditing(false);
     } catch (error) {
@@ -61,7 +61,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   return (
     <div className="mt-6 border bg-slate-100 p-4 rounded-md">
       <div className="font-semibold flex items-center justify-between">
-        Title Of Course
+        Price Of Course ($)
         <Button
           variant={isEditing ? "destructive" : "default"}
           onClick={() => setIsEditing(!isEditing)}
@@ -77,7 +77,15 @@ const TitleForm = ({initialData, courseId}: Props) => {
         </Button>
       </div>
       {!isEditing && (
-        <p className="p-3 bg-slate-200 rounded-md mt-5">{initialData.title}</p>
+        <p
+          className={cn(
+            "mt-5",
+            !initialData.price &&
+              "p-3 bg-slate-200 rounded-md italic text-sm text-red-400"
+          )}
+        >
+          {initialData.price ? formatPrice(initialData.price) : "No price here"}
+        </p>
       )}
       {isEditing && (
         <Form {...form}>
@@ -87,18 +95,20 @@ const TitleForm = ({initialData, courseId}: Props) => {
           >
             <FormField
               control={form.control}
-              name="title"
+              name="price"
               render={({field}) => (
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="Enter your title"
-                      {...field}
+                      type="number"
                       disabled={isSubmitting}
+                      placeholder="Enter your price"
+                      {...field}
+                      step={"0.01"}
                     />
                   </FormControl>
                   <FormDescription>
-                    You can change this title every time.
+                    You can change this price every time.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -112,4 +122,4 @@ const TitleForm = ({initialData, courseId}: Props) => {
   );
 };
 
-export default TitleForm;
+export default PriceForm;

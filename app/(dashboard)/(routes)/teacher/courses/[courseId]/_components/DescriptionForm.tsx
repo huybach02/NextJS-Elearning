@@ -21,11 +21,10 @@ import axios from "axios";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Textarea} from "@/components/ui/textarea";
+import {Course} from "@prisma/client";
 
 type Props = {
-  initialData: {
-    description: string | null;
-  };
+  initialData: Course;
   courseId: string;
 };
 
@@ -43,7 +42,7 @@ const DescriptionForm = ({initialData, courseId}: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
+      description: initialData.description || "",
     },
   });
 

@@ -19,28 +19,36 @@ import {SquarePen} from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import {cn} from "@/lib/utils";
+import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
+import {Combobox} from "@/components/ui/combobox";
 
 type Props = {
   initialData: Course;
   courseId: string;
+  options: {label: string; value: string}[];
 };
 
 const formSchema = z.object({
-  title: z.string().min(2, {
+  categoryId: z.string().min(1, {
     message: "This field cannot be empty",
   }),
 });
 
-const TitleForm = ({initialData, courseId}: Props) => {
+const CategoryForm = ({initialData, courseId, options}: Props) => {
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const selectedOption = options.find(
+    (option) => option.value === initialData.categoryId
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: initialData.title || "",
+      categoryId: initialData.categoryId || "",
     },
   });
 
@@ -49,7 +57,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await axios.put(`/api/courses/${courseId}`, values);
-      toast.success("Title updated");
+      toast.success("Category updated");
       router.refresh();
       setIsEditing(false);
     } catch (error) {
@@ -61,7 +69,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   return (
     <div className="mt-6 border bg-slate-100 p-4 rounded-md">
       <div className="font-semibold flex items-center justify-between">
-        Title Of Course
+        Category Of Course
         <Button
           variant={isEditing ? "destructive" : "default"}
           onClick={() => setIsEditing(!isEditing)}
@@ -77,7 +85,15 @@ const TitleForm = ({initialData, courseId}: Props) => {
         </Button>
       </div>
       {!isEditing && (
-        <p className="p-3 bg-slate-200 rounded-md mt-5">{initialData.title}</p>
+        <p
+          className={cn(
+            "mt-5",
+            !initialData.categoryId &&
+              "p-3 bg-slate-200 rounded-md italic text-sm text-red-400"
+          )}
+        >
+          {selectedOption?.label || "No category here"}
+        </p>
       )}
       {isEditing && (
         <Form {...form}>
@@ -87,18 +103,14 @@ const TitleForm = ({initialData, courseId}: Props) => {
           >
             <FormField
               control={form.control}
-              name="title"
+              name="categoryId"
               render={({field}) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="Enter your title"
-                      {...field}
-                      disabled={isSubmitting}
-                    />
+                    <Combobox options={options} {...field} />
                   </FormControl>
                   <FormDescription>
-                    You can change this title every time.
+                    You can change this category every time.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -112,4 +124,4 @@ const TitleForm = ({initialData, courseId}: Props) => {
   );
 };
 
-export default TitleForm;
+export default CategoryForm;

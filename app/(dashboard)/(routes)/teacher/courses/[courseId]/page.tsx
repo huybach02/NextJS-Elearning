@@ -2,11 +2,16 @@ import {IconBadge} from "@/components/IconBadge";
 import {db} from "@/lib/db";
 import {cn} from "@/lib/utils";
 import {auth} from "@clerk/nextjs";
-import {Bolt} from "lucide-react";
+import {Bolt, DollarSign, FolderCog, ListChecks} from "lucide-react";
 import {redirect} from "next/navigation";
 import React from "react";
 import TitleForm from "./_components/TitleForm";
 import DescriptionForm from "./_components/DescriptionForm";
+import ImageForm from "./_components/ImageForm";
+import CategoryForm from "./_components/CategoryForm";
+import PriceForm from "./_components/PriceForm";
+import AttachmentForm from "./_components/AttachmentForm";
+import ChapterForm from "./_components/ChapterForm";
 
 const CourseIdPage = async ({
   params: {courseId},
@@ -22,6 +27,25 @@ const CourseIdPage = async ({
   const course = await db.course.findUnique({
     where: {
       id: courseId,
+      userId,
+    },
+    include: {
+      chapters: {
+        orderBy: {
+          position: "asc",
+        },
+      },
+      attachments: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
     },
   });
 
@@ -35,6 +59,7 @@ const CourseIdPage = async ({
     course.imageUrl,
     course.price,
     course.categoryId,
+    course.chapters.some((chapter) => chapter.isPublished),
   ];
 
   const totalFields = requiredFields.length;
@@ -65,6 +90,38 @@ const CourseIdPage = async ({
           </div>
           <TitleForm initialData={course} courseId={course.id} />
           <DescriptionForm initialData={course} courseId={course.id} />
+          <CategoryForm
+            initialData={course}
+            courseId={course.id}
+            options={categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+          />
+          <ImageForm initialData={course} courseId={course.id} />
+        </div>
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <IconBadge icon={ListChecks} />
+              <h2 className="text-xl font-semibold">Course chapters</h2>
+            </div>
+            <ChapterForm initialData={course} courseId={course.id} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <IconBadge icon={DollarSign} />
+              <h2 className="text-xl font-semibold">Sell your course</h2>
+            </div>
+            <PriceForm initialData={course} courseId={course.id} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <IconBadge icon={FolderCog} />
+              <h2 className="text-xl font-semibold">Resources & Attachments</h2>
+            </div>
+            <AttachmentForm initialData={course} courseId={course.id} />
+          </div>
         </div>
       </div>
     </div>

@@ -22,8 +22,11 @@ import {useRouter} from "next/navigation";
 import {Course} from "@prisma/client";
 
 type Props = {
-  initialData: Course;
+  initialData: {
+    title: string;
+  };
   courseId: string;
+  chapterId: string;
 };
 
 const formSchema = z.object({
@@ -32,7 +35,7 @@ const formSchema = z.object({
   }),
 });
 
-const TitleForm = ({initialData, courseId}: Props) => {
+const ChapterTitleForm = ({initialData, courseId, chapterId}: Props) => {
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +51,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await axios.put(`/api/courses/${courseId}`, values);
+      await axios.put(`/api/courses/${courseId}/chapters/${chapterId}`, values);
       toast.success("Title updated");
       router.refresh();
       setIsEditing(false);
@@ -61,7 +64,7 @@ const TitleForm = ({initialData, courseId}: Props) => {
   return (
     <div className="mt-6 border bg-slate-100 p-4 rounded-md">
       <div className="font-semibold flex items-center justify-between">
-        Title Of Course
+        Title Of Chapter
         <Button
           variant={isEditing ? "destructive" : "default"}
           onClick={() => setIsEditing(!isEditing)}
@@ -112,4 +115,4 @@ const TitleForm = ({initialData, courseId}: Props) => {
   );
 };
 
-export default TitleForm;
+export default ChapterTitleForm;
