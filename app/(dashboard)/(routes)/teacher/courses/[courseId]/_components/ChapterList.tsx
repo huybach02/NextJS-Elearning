@@ -74,7 +74,7 @@ const ChapterList = ({onEdit, onReorder, items}: Props) => {
                     <div
                       className={cn(
                         "flex items-center gap-2 bg-slate-200 border text-slate-700 rounded-md mb-4 text-sm",
-                        chapter.isPublished && "bg-primary/90 text-primary"
+                        chapter.isPublished && "bg-teal-100 "
                       )}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
@@ -94,7 +94,7 @@ const ChapterList = ({onEdit, onReorder, items}: Props) => {
                         <Badge
                           className={cn(
                             "bg-red-400 hover:bg-red-500 cursor-default",
-                            chapter.isFree && "bg-teal-500"
+                            chapter.isFree && "bg-teal-500 hover:bg-teal-500"
                           )}
                         >
                           {chapter?.isFree ? "Free" : "Buy"}
@@ -102,7 +102,7 @@ const ChapterList = ({onEdit, onReorder, items}: Props) => {
                         <Badge
                           className={cn(
                             "bg-gray-500 hover:bg-gray-600 cursor-default",
-                            chapter.isPublished && "bg-primary"
+                            chapter.isPublished && "bg-primary hover:bg-primary"
                           )}
                         >
                           {chapter?.isPublished ? "Published" : "Draft"}

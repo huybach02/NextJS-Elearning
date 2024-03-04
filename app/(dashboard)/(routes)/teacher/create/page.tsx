@@ -88,7 +88,7 @@ const CreatePage = (props: Props) => {
               >
                 Continue
               </Button>
-              <Link href={"/"}>
+              <Link href={"/teacher/courses"}>
                 <Button
                   type="button"
                   variant={"outline"}
