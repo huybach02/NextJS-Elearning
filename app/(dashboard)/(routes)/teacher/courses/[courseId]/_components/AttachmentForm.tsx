@@ -83,22 +83,26 @@ const AttachmentForm = ({initialData, courseId}: Props) => {
               {initialData.attachments.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center p-3 bg-slate-200 rounded-md text-sm mt-5"
+                  className="flex items-center justify-between p-3 bg-slate-200 rounded-md text-sm mt-5"
                 >
-                  <File className="w-5 h-5 mr-2" />
-                  <span title={item.name} className="line-clamp-1">
-                    {item.name}
-                  </span>
-                  {deletingId === item.id && (
-                    <div>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    </div>
-                  )}
-                  {deletingId !== item.id && (
-                    <button onClick={() => onDelete(item.id)}>
-                      <X className="w-5 h-5 text-red-500 ml-auto" />
-                    </button>
-                  )}
+                  <div className="flex items-center">
+                    <File className="w-5 h-5 mr-2" />
+                    <span title={item.name} className="line-clamp-1">
+                      {item.name}
+                    </span>
+                  </div>
+                  <div>
+                    {deletingId === item.id && (
+                      <div>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      </div>
+                    )}
+                    {deletingId !== item.id && (
+                      <button onClick={() => onDelete(item.id)}>
+                        <X className="w-5 h-5 text-red-500 ml-auto" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

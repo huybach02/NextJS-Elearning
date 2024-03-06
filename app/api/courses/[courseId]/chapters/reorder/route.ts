@@ -31,7 +31,7 @@ export async function PUT(
           id: item.id,
         },
         data: {
-          position: item.position,
+          position: item.position + 1,
         },
       });
     }
