@@ -1,6 +1,10 @@
+import {getCourses} from "@/actions/get-courses";
+import {getProgress} from "@/actions/get-progress";
+import CourseProgress from "@/components/CourseProgress";
 import {Button} from "@/components/ui/button";
 import {db} from "@/lib/db";
 import {formatPrice} from "@/lib/format";
+import {auth} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import {redirect} from "next/navigation";
@@ -9,6 +13,8 @@ import React from "react";
 type Props = {};
 
 const CourseIdPage = async ({params}: {params: {courseId: string}}) => {
+  const {userId} = auth();
+
   const course = await db.course.findUnique({
     where: {
       id: params.courseId,
@@ -27,6 +33,25 @@ const CourseIdPage = async ({params}: {params: {courseId: string}}) => {
     redirect("/");
   }
 
+  const courses = await getCourses({
+    userId: userId!,
+  });
+
+  if (!userId) {
+    redirect("/");
+  }
+
+  const purchase = await db.purchase.findUnique({
+    where: {
+      userId_courseId: {
+        userId: userId!,
+        courseId: params.courseId,
+      },
+    },
+  });
+
+  const progressCount = await getProgress(userId, course.id);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3">
       <div className="w-full p-5 flex flex-col gap-5">
@@ -37,9 +62,22 @@ const CourseIdPage = async ({params}: {params: {courseId: string}}) => {
           width={500}
           height={300}
         />
-        <span className="flex justify-center p-5 border border-primary rounded-md text-2xl font-semibold text-red-400">
-          {formatPrice(Number(course.price))}
-        </span>
+        {purchase ? (
+          <>
+            <span className="flex justify-center p-5 border border-primary rounded-md text-2xl font-semibold text-teal-500">
+              Purchased
+            </span>
+            <CourseProgress
+              value={progressCount}
+              size="default"
+              variant={progressCount === 100 ? "success" : "default"}
+            />
+          </>
+        ) : (
+          <span className="flex justify-center p-5 border border-primary rounded-md text-2xl font-semibold text-red-400">
+            {formatPrice(Number(course.price))}
+          </span>
+        )}
         <Button>
           <Link
             href={`/courses/${course.id}/chapters/${course.chapters[0].id}`}

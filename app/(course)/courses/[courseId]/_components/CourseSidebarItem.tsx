@@ -36,9 +36,9 @@ const CourseSidebarItem = ({
       className={cn(
         "bg-slate-100 mb-2 hover:bg-slate-200/80 text-primary flex items-center",
         isActive && "bg-slate-300/70 hover:bg-slate-300/70",
-        isCompleted && "bg-green-100",
+        isCompleted && "bg-green-100/70 hover:bg-green-300/40",
         isLocked && "text-red-400",
-        isActive && isCompleted && "bg-green-200"
+        isActive && isCompleted && "bg-green-300/80"
       )}
     >
       <div className="flex items-center gap-2 p-4">
