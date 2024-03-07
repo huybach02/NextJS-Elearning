@@ -25,7 +25,8 @@ export const getCourses = async ({
       where: {
         isPublished: true,
         title: {
-          contains: title,
+          contains: title, // Dữ liệu trong cơ sở dữ liệu có thể chứa cả chữ in và chữ thường
+          mode: "insensitive", // Chế độ không phân biệt chữ in hoa và chữ thường
         },
         categoryId,
       },
